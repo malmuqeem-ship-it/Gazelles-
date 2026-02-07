@@ -1,0 +1,200 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>صح أم خطأ – غزال الريم والغزال الآدمي</title>
+
+<style>
+body{
+  margin:0;
+  font-family:"Noto Kufi Arabic", sans-serif;
+  background:linear-gradient(#f9f6ee,#e8dcc3);
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  min-height:100vh;
+  text-align:center;
+  color:#203228;
+}
+
+main{
+  background:#fff9f0;
+  padding:24px 30px;
+  border-radius:18px;
+  box-shadow:0 6px 16px rgba(0,0,0,.15);
+  width:90%;
+  max-width:650px;
+}
+
+h1{
+  color:#2f6f4f;
+  font-size:22px;
+  margin-bottom:10px;
+}
+
+img{
+  max-width:100%;
+  border-radius:14px;
+  margin:10px 0;
+}
+
+button{
+  margin:8px;
+  padding:12px 18px;
+  border:0;
+  border-radius:10px;
+  cursor:pointer;
+  font-size:18px;
+  font-weight:700;
+}
+
+.b-true{background:#2d9d62;color:#fff;}
+.b-false{background:#c85151;color:#fff;}
+
+#feedback{
+  margin-top:12px;
+  padding:12px;
+  border-radius:10px;
+  display:none;
+  background:#fff;
+  border:1px solid #e6dec9;
+}
+
+.correct{
+  background:#e6f4ea;
+  border-color:#2d9d62;
+}
+
+.wrong{
+  background:#fdecea;
+  border-color:#c85151;
+}
+
+#nextBtn{
+  display:none;
+  background:#2f6f4f;
+  color:#fff;
+}
+
+#end{
+  display:none;
+  margin-top:15px;
+}
+</style>
+</head>
+
+<body>
+<main>
+
+<h1>صح أم خطأ – غزال الريم والغزال الآدمي</h1>
+
+<p id="question">اضغطي "ابدئي" لعرض أول سؤال</p>
+<div id="imageBox"></div>
+
+<div>
+  <button class="b-true" id="btnTrue" disabled>صح</button>
+  <button class="b-false" id="btnFalse" disabled>خطأ</button>
+</div>
+
+<div id="feedback"></div>
+
+<button id="nextBtn">التالي ↻</button>
+<button id="startBtn">ابدئي ▶</button>
+
+<div id="end">
+  <h3>انتهت اللعبة 🎉</h3>
+  <p>نتيجتك: <span id="score"></span> من <span id="total"></span></p>
+  <button onclick="location.reload()">إعادة</button>
+</div>
+
+</main>
+
+<script>
+const questions = [
+  {
+    q:"لون غزال الريم رملي فاتح وخطوط الخاصرة غير واضحة",
+    a:true,
+    ex:"إجابة صحيحة ✅ يتميّز غزال الريم بلونه الرملي الباهت، وتكون خطوط الخاصرة خفيفة أو غير واضحة"
+  },
+  {
+    q:"أنف الغزال الآدمي يخلو من العلامات الداكنة",
+    a:false,
+    ex:"إجابة خاطئة ❌ يتميّز الغزال الآدمي بوجه بارز المعالم مع بقعة سوداء على الأنف"
+  },
+  {
+    q:"الغزال الآدمي يتميّز بلون بني مائل للأحمرار مع خط داكن واضح يفصل بين البطن والظهر",
+    a:true,
+    ex:"إجابة صحيحة ✅ من أبرز صفات الغزال الآدمي وجود خط داكن واضح يفصل بين منطقتي البطن والظهر"
+  },
+  {
+    q:"قرون ذكر الغزال الآدمي قصيرة وواضحة، بينما قرون الأنثى أطول وأكثر بروزًا",
+    a:false,
+    ex:"إجابة خاطئة ❌ قرون الذكر قصيرة وواضحة، أما الأنثى فقد تكون قرونها أقصر وأرفع ، حلقاتها غير واضحة."
+  },
+  {
+    q:"غزال الريم يُعد من أكبر أنواع الغزلان",
+    a:true,
+    ex:"إجابة صحيحة ✅ يعد غزال الريم من أكبر أنواع الغزلان."
+  },
+  {
+    q:"يعد المها العربي من الحيوانات المهددة بالانقراض",
+    a:true,
+    img:"https://upload.wikimedia.org/wikipedia/commons/4/4c/Arabian_oryx.jpg",
+    ex:"إجابة صحيحة ✅ المها العربي من الحيوانات المهددة بالانقراض وقد أُعيد توطينه بجهود الحماية"
+  }
+];
+
+let index=-1, score=0;
+
+const q=document.getElementById("question");
+const fb=document.getElementById("feedback");
+const t=document.getElementById("btnTrue");
+const f=document.getElementById("btnFalse");
+const n=document.getElementById("nextBtn");
+const s=document.getElementById("startBtn");
+const end=document.getElementById("end");
+const imgBox=document.getElementById("imageBox");
+
+document.getElementById("total").textContent=questions.length;
+
+function showQuestion(){
+  index++;
+  if(index>=questions.length){ endGame(); return; }
+  const cur=questions[index];
+  q.textContent=cur.q;
+  imgBox.innerHTML=cur.img ? `<img src="${cur.img}" alt="صورة توضيحية">` : "";
+  fb.style.display="none";
+  fb.className="";
+  t.disabled=f.disabled=false;
+  n.style.display="none";
+}
+
+function check(ans){
+  const cur=questions[index];
+  const correct=ans===cur.a;
+  fb.style.display="block";
+  fb.textContent=cur.ex;
+  fb.classList.add(correct ? "correct" : "wrong");
+  if(correct) score++;
+  t.disabled=f.disabled=true;
+  n.style.display="inline-block";
+}
+
+function endGame(){
+  q.textContent="أحسنتِ! انتهت الأسئلة.";
+  imgBox.innerHTML="";
+  t.style.display=f.style.display=n.style.display=s.style.display="none";
+  fb.style.display="none";
+  end.style.display="block";
+  document.getElementById("score").textContent=score;
+}
+
+t.onclick=()=>check(true);
+f.onclick=()=>check(false);
+n.onclick=showQuestion;
+s.onclick=()=>{s.style.display="none";showQuestion();};
+</script>
+
+</body>
+</html>
